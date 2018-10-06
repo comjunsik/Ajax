@@ -28,7 +28,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 **userName=request.getParameter("userName");**<br>
 브라우저로 보내지는 데이터의 한글 처리(즉, 서블릿을 통해 HTTP로 보낼 데이터를 한글로 처리하겠다.)
 
-**JSON 이란?**
+<h3>JSON 이란?<h3>
  2. 무엇을 줄인 말이냐?
 
     JavaScript Object Notation이라는 이름에서 알 수 있듯이 자바스크립트를 위한 것이고 객체 형식으로 자료를 표현하는 것이다.
@@ -90,3 +90,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
     이건 해당 서버에서 JSONP의 방식을 지원해 줘야지만 가능하다. 이것이 불가능하면 역시 프락시를 써야 한다.
 
 출처:http://egloos.zum.com/killins/v/3013974
+
+AJAX를 사용할때 그 데이터 포맷을 JSON으로 한다.
+getJSON()을 한다면 client가 요철을 보낼때 그 결과를 JSON형식으로 돌려 받겠다는 뜻이다.
+이 JSON을 만들어내는 역할을 해당 Servlet이 하는 것이다.
