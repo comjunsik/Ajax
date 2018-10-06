@@ -44,3 +44,39 @@ viewport란 우리말로 의 뷰포트와 모바일보임창, 즉 화면 상의 
 
  **&lt;script src="https://code.jquery.com/jquery-3.1.1.min.js">&lt;/script>**
 외부 자바스크립트 라이브러리 추가
+
+# UserDAO.java
+회원 조회 함수
+```java
+public ArrayList<User> search(String userName){
+		String SQL = "SELECT * FROM USER WHERE userName LIKE ?";
+		ArrayList<User> userList = new ArrayList<User>();
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, userName);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				User user = new User();
+				user.setUserName(rs.getString(1));
+				user.setUserAge(rs.getInt(2));
+				user.setUserGender(rs.getString(3));
+				user.setUserEmail(rs.getString(4));
+				userList.add(user);
+				
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return userList;
+	}
+```
+**public ArrayList&lt;User> search(String userName)**<br>
+User클래스를 저장하는 ArrayList를 반환값으로
+**String SQL = "SELECT * FROM USER WHERE userName LIKE ?";**<br>
+```JAVA
+pstmt = conn.prepareStatement(SQL);
+pstmt.setString(1, userName);
+```
+SQL문 ?에 userName을 삽입
+따라서 userName에 들어가는 문자열로 테이블 검색
