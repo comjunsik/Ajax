@@ -19,6 +19,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset-UTF-8");
 		String userName=request.getParameter("userName");
+		response.getWriter().write(getJSON(userName));
 	}
 ```
 **doPost()**<br>
@@ -27,8 +28,12 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 파라미터로 전달되는 데이터의 한글 처리(즉, 전송 받는 데이터를 한글로 받겠다.)
 **userName=request.getParameter("userName");**<br>
 브라우저로 보내지는 데이터의 한글 처리(즉, 서블릿을 통해 HTTP로 보낼 데이터를 한글로 처리하겠다.)
+**response.getWriter().write(getJSON(userName));**<br>
+응답을 getWriter()메서드를 사용함으로써 '쓰기'를 통해 응답하겠다는 뜻
+PrintWtiter.write(Stirng)메서드는 html에 해당 내용을 작성하라는 뜻이다.
+.print(String)은 html에 해당 내용을 인쇄하라는 뜻이다. 
 
-<h3>JSON 이란?<h3>
+**JSON 이란?**<br>
  2. 무엇을 줄인 말이냐?
 
     JavaScript Object Notation이라는 이름에서 알 수 있듯이 자바스크립트를 위한 것이고 객체 형식으로 자료를 표현하는 것이다.
@@ -94,3 +99,48 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 AJAX를 사용할때 그 데이터 포맷을 JSON으로 한다.
 getJSON()을 한다면 client가 요철을 보낼때 그 결과를 JSON형식으로 돌려 받겠다는 뜻이다.
 이 JSON을 만들어내는 역할을 해당 Servlet이 하는 것이다.
+
+>**StringBuffer이란**<br>
+StringBuffer 클래스는 자바 프로그램 내에서 변하는 문자열을 다룰 때 사용한다. StringBuffer 클래스의 객체는 크기가 동적인데, 객체 생성시 크기를 지정하지 않아도 기본적으로 16개의 문자를 저장할 수 있는 버퍼 공간을 가진다.
+String 클래스의 객체는 한 번 생성되면 그 내용이 변하지 않는 반면에, StringBuffer 클래스의 객체는 한 번 생성된 후에도 계속하여 저장하고 있는 문자열의 내용을 변경할 수 있다. 그러므로, StringBuffer 클래스의 메소드는 문자열 처리 후의 결과를 원래의 StringBuffer 객체에 반영하고, 메소드 리턴 타입은 void 이다.
+
+출처:http://hyeonstorage.tistory.com/179
+->StringBuffer의 생성자&메소드
+
+```java
+public String getJSON(String userName) {
+		if(userName == null)
+			userName="";
+		StringBuffer result = new StringBuffer("");
+		result.append("{\"result\":[");
+		UserDAO userDAO = new UserDAO();
+		ArrayList<User> userList = userDAO.search(userName);
+		for(int i =0; i< userList.size(); i++) {
+			result.append("[{\"value\":\"" + userList.get(i).getUserName()+"\"},");
+			result.append("{\"value\": \"" + userList.get(i).getUserAge()+"\"},");
+			result.append("{\"value\": \"" + userList.get(i).getUserGender()+"\"},");
+			result.append("{\"value\": \"" + userList.get(i).getUserEmail()+"\"}],");
+		}
+		result.append("]}");
+		return result.toString();
+	}
+```
+**SringBuffer append("문자열");**<br>
+문자열 데이터를 현재 문자열 끝에 추가한다.
+```java
+UserDAO userDAO = new UserDAO();
+		ArrayList<User> userList = userDAO.search(userName);
+```
+userDAO에 있는 회원 정보를 List 형태로 반환 받는 함수 search()를 호출한다.
+
+**JSON 기본구조 -{"이름":"값"}**
+
+JSON 배열을 의미하는 String 리터럴은
+"[{\"이름":\"값\", \"이름2\":\"값2\"}, {\"이름":\"값\", \"이름2\":\"값2\"}]"
+이런식으로 표현한다.
+따라서 회원의 수만 큼 반복해서 각각의 회원의 정보를 JSON String 형식으로 넣어준다.
+result란 변수로 배열들을 담아줌.
+**userList.get(i).getUserName()**<br>
+특정 인덱스에 위치한 엘리먼트를 가져올 때는 get을 사용합니다. 이때 내부에서 배열을 사용하기 때문에 ArrayList는 매우 빠르게 엘리먼트를 가져옵니다.
+따라서 각 인덱스(각 회원)의 정보를 가져온다.
+마지막에 return.toString()을 함으로써 JSON형태로 출력하게 된다.

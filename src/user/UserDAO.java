@@ -14,12 +14,12 @@ public class UserDAO {
 	
 	public UserDAO() {
 		try {
-			String dbURL = "jdbc:mysql://localhost:3306/BBS?serverTimezone=Asia/Seoul&autoReconnect=true&useSSL=false";
+			String dbURL = "jdbc:mysql://localhost:3306/AJAX?serverTimezone=Asia/Seoul&autoReconnect=true&useSSL=false";
 			String dbID = "root";
 			String dbPassword = "root";
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
-		} catch (Exception e) {
+		} catch (Exception e) { 
 			e.printStackTrace();
 		}
 	}
@@ -29,7 +29,7 @@ public class UserDAO {
 		ArrayList<User> userList = new ArrayList<User>();
 		try {
 			pstmt = conn.prepareStatement(SQL);
-			pstmt.setString(1, userName);
+			pstmt.setString(1,"%" + userName + "%");
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				User user = new User();
@@ -37,13 +37,26 @@ public class UserDAO {
 				user.setUserAge(rs.getInt(2));
 				user.setUserGender(rs.getString(3));
 				user.setUserEmail(rs.getString(4));
-				userList.add(user);
-				
-			}
-			
+				userList.add(user);				
+			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return userList;
+	}
+	
+	public int register(User user) {
+		String SQL = "INSERT INTO USER VALUES (?, ?, ?, ?)";
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, user.getUserName());
+			pstmt.setInt(2, user.getUserAge());
+			pstmt.setString(3, user.getUserGender());
+			pstmt.setString(4, user.getUserEmail());
+			return pstmt.executeUpdate();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
 	}
 }
