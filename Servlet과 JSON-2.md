@@ -109,17 +109,18 @@ String 클래스의 객체는 한 번 생성되면 그 내용이 변하지 않�
 
 ```java
 public String getJSON(String userName) {
-		if(userName == null)
-			userName="";
+		if(userName == null) {
+			userName = "";
+		}
 		StringBuffer result = new StringBuffer("");
 		result.append("{\"result\":[");
 		UserDAO userDAO = new UserDAO();
 		ArrayList<User> userList = userDAO.search(userName);
 		for(int i =0; i< userList.size(); i++) {
-			result.append("[{\"value\":\"" + userList.get(i).getUserName()+"\"},");
-			result.append("{\"value\": \"" + userList.get(i).getUserAge()+"\"},");
-			result.append("{\"value\": \"" + userList.get(i).getUserGender()+"\"},");
-			result.append("{\"value\": \"" + userList.get(i).getUserEmail()+"\"}],");
+			result.append("[{\"value\": \"" + userList.get(i).getUserName() + "\"},");
+			result.append("{\"value\": \"" + userList.get(i).getUserAge() + "\"},");
+			result.append("{\"value\": \"" + userList.get(i).getUserGender() + "\"},");
+			result.append("{\"value\": \"" + userList.get(i).getUserEmail()  + "\"}],");
 		}
 		result.append("]}");
 		return result.toString();
@@ -140,6 +141,10 @@ JSON 배열을 의미하는 String 리터럴은
 이런식으로 표현한다.
 따라서 회원의 수만 큼 반복해서 각각의 회원의 정보를 JSON String 형식으로 넣어준다.
 result란 변수로 배열들을 담아줌.
+value : 유저이름
+value : 유저나이
+value : 유저성별
+value : 유저 이메일
 **userList.get(i).getUserName()**<br>
 특정 인덱스에 위치한 엘리먼트를 가져올 때는 get을 사용합니다. 이때 내부에서 배열을 사용하기 때문에 ArrayList는 매우 빠르게 엘리먼트를 가져옵니다.
 따라서 각 인덱스(각 회원)의 정보를 가져온다.
