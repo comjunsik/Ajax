@@ -122,6 +122,8 @@ searchRequest.onreadystatechange = searchProcess() {
 ```
 이런 식으로 임의 함수(anonymous functions)방법으로 직접적으로 함수 본체를 기입해도 된다.
 
+---
+
 ```JSP
 function searchProcess(){
 	var table = document.getElementById("ajaxTable");
@@ -153,3 +155,57 @@ if(searchRequest.readyState == 4 && searchRequest.status == 200)
 ![readystate](https://user-images.githubusercontent.com/41488792/46742048-38f3a680-cce1-11e8-85a4-ebdcf413a13b.PNG)
 
 ![status](https://user-images.githubusercontent.com/41488792/46742067-414be180-cce1-11e8-9eae-3f98ea897b05.PNG)
+
+```jsp
+var object = eval('(' + searchRequest.responseText + ')');
+```
+>**eval(string)**<br>
+주어진 매개변수를 평가하여 얻은 값, 값이 없다면 undefined를 반환한다.
+문자로써 표현된 자바스크립트 코드를 실행하는 함수.
+**중요!**<br>
+Ajax에서 리턴받을 JSON의 형태가
+{value:'값', value2:'값2'}
+이와 같은 형태일 경우
+위의 코드처럼 eval을 해주면 **JSON 오브젝트**로 변환할 수 있다.
+JSON의 형태가
+[{value:'값X', value2:'값2'},
+ {value:'값Y', value2:'값2'}]
+ 처럼 배열로 되어 있을 경우에는
+ eval(XMLHttpRequest.responseText)
+ 만 해주면 JSON 오브젝트로 변환할 수 있다.
+ 현재 UserSearchServlet에서는 
+ result라는 이름의 변수안에 배열을 담은
+ {result:[배열]} 형태이므로 '('을 붙여주도록 하자.
+
+
+>**XMLHttpRequest.responseText**<br>
+><li>.reponseText - 서버의 응답을 텍스트 문자열로 반환한다.
+><li>.reponseXML - 서버의 응답을 XMLDocument 객체로 반환하며 당신은 자바스크립트의 DOM 함수들을 통해 이 객체를 다룰 수 있을 것이다.
+
+여기서의 해당 코드의 responseText의 반환 값은 Servlet에서 넘어온 JSON이다.
+<br>
+
+```jsp
+var object = eval('(' + searchRequest.responseText + ')');
+var result = object.result;
+```
+
+eval(.responseText)를 통해 받아온
+JSON 오브젝트에는 result라는 이름의 변수 안에 회원정보 배열이 들어가 있는데, 해당 result 변수값을 object.result를 이용해 가져오는 것이다.
+따라서 여기서 선언한 var result에는 회원들의 정보가 담긴다.
+```javascript
+for(var i = 0; i < result.length; i++) {
+	var row = table.insertRow(0);
+	for(var j = 0; j < result[i].length; j++){
+		var cell = row.insertCell(j);
+		cell.innerHTML = result[i][j].value;
+	}
+}
+```				
+result.length : 회원의 수 만큼
+
+insertRow()는 새 줄을 삽입하는 함수, 새 행을 삽입&lt;tr>
+table.insertRow(0)을 할경우 가장 나중에 db에 들어간 정보(회원)이 상단(맨위)에 표시되게 됨
+table.insertRow(table.rows.length)할 경우 가장 나중에 db에 들어간 정보가 맨 하단에 표시되게 됨.
+
+insertCell() HTML 테이블의 행&lt;tr>의 칼럼&lt;td> 요소를 삽입하는 함수
