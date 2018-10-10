@@ -67,6 +67,8 @@ onkeyup은 키보드 이벤트, 사용자가 키를 실행할때(타자를 칠�
 >**var searchRequest = new XMLHttpRequest();**<br>
 JavaScript를 이용하여 서버로 보내는 HTTP request를 만들기 위해서는 그에 맞는 기능을 제공하는 Object의 인스턴스가 필요합니다. XMLHttpRequest 가 그러한 Object의 한 예입니다. 이러한 로직은 Internet Explorer의 XMLHTTP 라고 불리는 ActiveX 객체로 부터 시작되었습니다.
 
+var 키워드를 사용하지 않고 변수를 선언하게 되면 해당 변수는 전역변수로 된다. 이를 방지하기 위해 변수 선언시 var 키워드를 통해 선언하도록 하자.
+
 ```jsp
 function searchFunction(){
 	searchRequest.open("Post", "./UserSearchServlet?userName=" + encodeURIComponent(document.getElementById("userName").value), true);
@@ -96,7 +98,58 @@ searchRequest.open("Post", "./UserSearchServlet?userName=" + encodeURIComponent(
 ```
 >**encodeURIComponent(encodedURIString)**<br>
 텍스트 문자열을 유효한 URI(Uniform Resource Identifier) 구성 요소로 인코딩합니다.
+여기서는 UTF-8으로 인코딩
 **document.getElementById("userName").value**<br>
 form에 있는 데이터의 유효성을 체크하기 위해, 우리는 웹 페이지로부터 데이터를 잡아낼 필요가 있다. 자바 스크립트가 포함된 웹 페잊 엘리멘트(Element)에 접근하기 위한 핵심 열쇠가 HTML 태그의 id 속성이다.
-document.getElementById().value는
+document.getElementById()는
 해당하는 엘리멘트의 ID를 가져오는 함수이다.
+.value를 통해 해당 ID의 데이터를 가져올 수 있게 된다.
+
+따라서 위의 코드는 POST방식으로
+http://localhost:8080/Ajax/UserSearchServlet 에 검색창의 내용을
+UTF-8로 인코딩 해서
+userName이라는 이름으로 파라미터를 전달하고, 매개변수값 true를 통해 비동기적으로 수행한다는 뜻이다.
+--> GET 방식으로 데이터를 전달하는 방법인데 왜 POST를 사용했는지는 아직 의문
+
+**searchRequest.onreadystatechange = searchProcess;**<br>
+.onreadystatechange property에 특정 함수를 할당하면 요청에 대한 상태가 변화할 때 특정 함수가 불리게 된다.
+단순하게 그 함수를 지정하는 것이므로 그 함수로 어떠한 변수도 전달하지 않는다.
+그렇기 때문에 코딩을 할때
+```jsp
+searchRequest.onreadystatechange = searchProcess() {
+	\\함수의 코딩 내용
+}
+```
+이런 식으로 임의 함수(anonymous functions)방법으로 직접적으로 함수 본체를 기입해도 된다.
+
+```JSP
+function searchProcess(){
+	var table = document.getElementById("ajaxTable");
+	table.innerHTML = "";
+	if(searchRequest.readyState == 4 && searchRequest.status == 200){
+		var object = eval('(' + searchRequest.responseText + ')');
+		var result = object.result;
+		for(var i = 0; i < result.length; i++) {
+			var row = table.insertRow(0);
+			for(var j = 0; j < result[i].length; j++){
+				var cell = row.insertCell(j);
+						cell.innerHTML = result[i][j].value;
+			}
+		}
+	}
+}
+```
+
+```jsp
+var table = document.getElementById("ajaxTable");
+table.innerHTML = "";
+```
+id가 ajaxTable인 HTML element를 table이라는 변수로 접근하겟다.
+.innerHTML=""을 통해서 해당 element의 HTML내용을 모두 초기화(삭제) 하겠다.
+
+```JSP
+if(searchRequest.readyState == 4 && searchRequest.status == 200)
+```
+![readystate](https://user-images.githubusercontent.com/41488792/46742048-38f3a680-cce1-11e8-85a4-ebdcf413a13b.PNG)
+
+![status](https://user-images.githubusercontent.com/41488792/46742067-414be180-cce1-11e8-9eae-3f98ea897b05.PNG)
